@@ -3,32 +3,62 @@ from executor import execute_research
 from reflection import reflect_on_results
 from synthesizer import synthesize_evidence
 
+def run_specialist(
 
-def run_specialist(query, system_prompt):
+    query,
+
+    domain,
+
+    sources
+
+):
 
     plan = create_research_plan(
-        domain=system_prompt,
-        query=query
+
+        domain,
+
+        query
+
     )
 
-    results = execute_research(query)
+    results = execute_research(
+
+        query=query,
+
+        sources=sources
+
+    )
 
     evidence = synthesize_evidence(
-        domain=system_prompt,
-        query=query,
-        plan=plan,
-        search_results=results
+
+        domain,
+
+        query,
+
+        plan,
+
+        results
+
     )
 
-    reflection = reflect_on_results(
-        domain=system_prompt,
-        query=query,
-        plan=plan,
-        evidence=evidence
+    report = reflect_on_results(
+
+        domain,
+
+        query,
+
+        plan,
+
+        evidence
+
     )
 
     return {
+
         "plan": plan,
+
         "evidence": evidence,
-        "reflection": reflection
+
+        "reflection": report
+
     }

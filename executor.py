@@ -1,27 +1,18 @@
-from tools import search_web, search_tavily
-
-
-def execute_research(query):
+def execute_research(query, sources):
 
     results = {}
 
-    try:
-        print("Searching DDGS...")
-        results["ddgs"] = search_web(query)
-        print("DDGS Done")
-    except Exception as e:
-        print("DDGS Error:", e)
-        results["ddgs"] = []
+    for tool in sources:
 
-    try:
-        print("Searching Tavily...")
-        results["tavily"] = search_tavily(query)
-        print("Tavily Done")
-    except Exception as e:
-        print("Tavily Error:", e)
-        results["tavily"] = []
+        try:
+            print(f"Searching {tool.__name__}...")
 
-    # Temporarily disable arXiv
-    results["arxiv"] = []
+            results[tool.__name__] = tool(query)
+
+        except Exception as e:
+
+            print(tool.__name__, e)
+
+            results[tool.__name__] = []
 
     return results
