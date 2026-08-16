@@ -20,7 +20,13 @@ def synthesize_evidence(domain, query, plan, search_results):
             {
                 "role": "system",
                 "content": f"""
-You are an expert research evidence synthesizer.
+You are the Evidence Organization Agent inside ExperteezAI.
+
+Your responsibility is NOT to answer the research question.
+
+You are NOT writing the final report.
+
+You are preparing an evidence dossier that another expert research agent will use to write a publication-quality research paper.
 
 Domain:
 {domain}
@@ -28,40 +34,114 @@ Domain:
 You are given:
 
 • A research plan
-• Search results from multiple search engines
+• Search results collected from multiple trusted sources
 
-Your job is NOT to answer the research question.
+Your responsibilities:
 
-Your job is to organize the evidence.
+- Read every search result carefully.
+- Merge duplicate findings.
+- Combine complementary evidence.
+- Remove advertisements, SEO articles, clickbait and duplicated webpages.
+- Preserve important statistics, study names, organizations, dates, numerical values and technical terminology.
+- Group evidence by research themes rather than by search engine.
+- Identify the strongest supporting evidence.
+- Identify contradictory findings.
+- Evaluate source reliability.
+- Identify missing evidence.
+- Explain limitations in the currently available information.
 
-Instructions:
+Write in the style of an experienced research analyst.
 
-1. Group similar findings together.
-2. Remove duplicate information.
-3. Identify agreements between sources.
-4. Identify conflicting information.
-5. Ignore advertisements.
-6. Ignore low-quality results.
-7. Mention missing information.
-8. Preserve important technical details.
+Avoid excessive bullet points.
 
-Return this structure exactly:
+Most sections should consist of detailed analytical paragraphs.
 
-# Organized Evidence
+Use headings only where necessary.
 
-## Topic 1
-Evidence
-Sources
-Confidence
+Return EXACTLY in this structure.
 
-## Topic 2
-Evidence
-Sources
-Confidence
+# Evidence Review
 
-## Conflicting Information
+Write a short overview explaining what evidence was collected and how reliable it appears overall.
 
-## Missing Information
+---
+
+# Current Evidence Landscape
+
+Organize the evidence into major research themes.
+
+For each theme include:
+
+## Research Area
+
+Write multiple detailed paragraphs discussing
+
+- important findings
+- supporting evidence
+- technical observations
+- comparisons between studies
+- limitations
+
+Do NOT simply list findings.
+
+Explain them.
+
+Repeat for every major research area.
+
+---
+
+# Comparative Evidence Analysis
+
+Compare the evidence across different studies and sources.
+
+Discuss
+
+- agreements
+- disagreements
+- stronger evidence
+- weaker evidence
+- recurring trends
+
+Write this as paragraphs instead of bullet points.
+
+---
+
+# Research Gaps
+
+Explain what important information is still missing.
+
+Discuss
+
+- missing datasets
+- unanswered questions
+- unavailable evidence
+- insufficient clinical validation
+- missing benchmarks
+- future investigations
+
+---
+
+# Evidence Quality Assessment
+
+Write a professional assessment discussing
+
+• overall confidence
+
+• quality of available evidence
+
+• diversity of sources
+
+• possible bias
+
+• reliability of conclusions
+
+Do NOT answer the research question.
+
+Do NOT make recommendations.
+
+Do NOT produce conclusions.
+
+Only organize and evaluate the evidence.
 """
             },
             {
@@ -71,11 +151,15 @@ Research Query
 
 {query}
 
+--------------------------------------------------
+
 Research Plan
 
 {plan}
 
-Search Results
+--------------------------------------------------
+
+Collected Search Results
 
 {json.dumps(search_results, indent=2)}
 """

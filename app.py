@@ -2,81 +2,99 @@ import streamlit as st
 from validator import validate_domain
 from config import DOMAINS
 from agent import run_agent
-
 st.set_page_config(
-    page_title="Research Specialist",
-    page_icon="🔬",
+    page_title="ExperteezAI Research",
+    page_icon="🧠",
     layout="wide"
 )
 
-st.title("🔬 Research Specialist")
+st.title("🧠 ExperteezAI Research")
 
-st.write(
-    "Choose a research domain and enter your research topic."
+st.markdown(
+"""
+Generate comprehensive, evidence-based research papers using specialized
+domain research agents and trusted knowledge sources.
+"""
 )
 
 domain = st.selectbox(
-    "Choose Research Domain",
+    "Research Domain",
     list(DOMAINS.keys())
 )
 
 query = st.text_area(
     "Research Topic",
-    height=120,
+    height=140,
     placeholder="Example: Recent developments in Retrieval-Augmented Generation"
 )
 
-if st.button("🚀 Start Research", use_container_width=True):
+if st.button("🚀 Generate Research Paper", use_container_width=True):
 
-    if query.strip() == "":
+    if not query.strip():
         st.warning("Please enter a research topic.")
         st.stop()
 
-    with st.spinner("Checking domain..."):
-
+    with st.spinner("Identifying research domain..."):
         detected_domain = validate_domain(query)
 
-    st.write("Selected Domain:", domain)
-    st.write("Detected Domain:", detected_domain)
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.info(f"Selected Domain\n\n**{domain}**")
+
+    with col2:
+        st.info(f"Detected Domain\n\n**{detected_domain}**")
 
     if detected_domain != domain:
 
-        st.error("⚠ Domain Mismatch")
-
-        st.info(
-            f"""
-Selected Domain: **{domain}**
-
-Detected Domain: **{detected_domain}**
-"""
-        )
+        st.error("The selected domain does not match the detected topic.")
 
         if st.button(f"Switch to {detected_domain}"):
 
-            result = run_agent(
-                detected_domain,
-                query
-            )
+            domain = detected_domain
 
-            st.subheader("Research Plan")
-            st.markdown(result["plan"])
+        else:
+            st.stop()
 
-            st.subheader("Reflection")
-            st.markdown(result["reflection"])
-
-    else:
-        
+    with st.spinner("ExperteezAI specialists are conducting research..."):
 
         result = run_agent(domain, query)
 
-        st.subheader("📋 Research Plan")
-        st.markdown(result["plan"])
-        st.divider()
+    st.divider()
 
-        st.subheader("🧩 Evidence Synthesis")
+    with st.expander("📋 Research Plan", expanded=False):
+        st.markdown(result["plan"])
+
+    with st.expander("🧩 Evidence Synthesis", expanded=False):
         st.markdown(result["evidence"])
 
-        st.divider()
+    st.divider()
 
-        st.subheader("📖 Final Research Report")
-        st.markdown(result["reflection"])
+    st.header("📖 ExperteezAI Research Paper")
+
+    reports = result["reflection"]
+
+    if isinstance(reports, list):
+
+        progress = st.progress(0)
+
+        total = len(reports)
+
+        for i, section in enumerate(reports):
+
+            progress.progress((i + 1) / total)
+
+            st.markdown(section)
+
+            if i != total - 1:
+                st.divider()
+
+        progress.empty()
+
+    else:
+
+        st.markdown(reports)
+
+    st.divider()
+
+    st.success("Research completed successfully.")

@@ -1,7 +1,6 @@
 from tools import (
     search_web,
     search_tavily,
-    search_arxiv,
     search_github,
     search_huggingface,
     search_openai_blog,
@@ -10,7 +9,6 @@ from tools import (
 )
 
 TECHNOLOGY_SOURCES = [
-    search_arxiv,
     search_github,
     search_huggingface,
     search_openai_blog,

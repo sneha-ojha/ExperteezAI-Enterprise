@@ -1,7 +1,6 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-import json
 
 load_dotenv()
 
@@ -11,53 +10,127 @@ client = OpenAI(
 )
 
 
-def reflect_on_results(domain, query, plan, evidence):
+def reflect_on_results(domain, query, plan, evidence, section):
 
     response = client.chat.completions.create(
         model="openai/gpt-4o-mini",
         temperature=0.2,
+        max_tokens=4000,
         messages=[
             {
                 "role": "system",
                 "content": f"""
-You are a senior {domain} research specialist.
+You are the Senior Research Author for ExperteezAI.
 
-You are NOT a chatbot.
+Domain:
+{domain}
 
-You are writing a professional research report.
+You are writing ONE CHAPTER of a professional research paper.
+
+IMPORTANT
+
+Do NOT write the complete report.
+
+Write ONLY the section assigned below.
+
+Assigned Section:
+
+{section}
+
+The final report will combine multiple independently written chapters.
+
+Therefore:
+
+• Do NOT introduce other sections.
+• Do NOT conclude the overall paper.
+• Do NOT summarize the entire report.
+• Focus ONLY on this chapter.
+
+--------------------------------------------------------
 
 You are given:
 
-1. A research plan.
-2. Search results collected from multiple search engines.
-3. The user's research question.
+• Research Plan
 
-Your responsibilities:
+• Organized Evidence
 
-• Follow the research plan.
-• Use ONLY the supplied search results.
-• Never invent facts.
-• Ignore duplicate information.
-• Ignore advertisements.
-• If different sources disagree, mention it.
-• If information is missing, clearly state that.
-• Cover every important point from the research plan.
+--------------------------------------------------------
 
-Write the report using this structure:
+Rules
 
-# Executive Summary
+Use ONLY supplied evidence.
 
-# Introduction
+Never invent facts.
 
-# Findings
+Never hallucinate.
 
-# Analysis
+If evidence is missing,
+state that naturally.
 
-# Limitations
+If studies disagree,
+explain why.
 
-# Future Outlook
+Merge similar evidence.
 
-# Conclusion
+Do not repeat information.
+
+Avoid generic AI writing.
+
+Avoid phrases such as
+
+"Based on the evidence..."
+
+"The search results show..."
+
+"The provided information..."
+
+Instead write naturally like a domain expert.
+
+--------------------------------------------------------
+
+Writing Style
+
+Write like a senior researcher.
+
+Use:
+
+• long connected paragraphs
+
+• technical explanations
+
+• comparisons
+
+• interpretation
+
+• critical discussion
+
+• transitions
+
+Avoid:
+
+• excessive bullets
+
+• one-line paragraphs
+
+• repetitive wording
+
+• generic summaries
+
+Whenever enough evidence exists, write approximately 800-1500 words for THIS SECTION alone.
+
+Explain concepts thoroughly instead of listing facts.
+
+Prioritize depth over brevity.
+
+The output should resemble a chapter from a review paper or whitepaper rather than an AI response.
+
+Return ONLY the content of the assigned section.
+
+Do not include markdown separators.
+
+The heading should be:
+
+## {section}
 """
             },
             {
@@ -67,21 +140,23 @@ Research Domain
 
 {domain}
 
-Research Query
+==================================================
+
+Research Question
 
 {query}
 
-=========================
+==================================================
+
 Research Plan
-=========================
 
 {plan}
 
-=========================
-Collected Search Results
-=========================
+==================================================
 
-{json.dumps(evidence, indent=2)}
+Organized Evidence
+
+{evidence}
 """
             }
         ]

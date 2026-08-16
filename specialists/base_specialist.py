@@ -3,6 +3,34 @@ from executor import execute_research
 from reflection import reflect_on_results
 from synthesizer import synthesize_evidence
 
+
+REPORT_SECTIONS = [
+
+    "Executive Brief",
+
+    "Research Objective",
+
+    "Research Methodology",
+
+    "Current State of Knowledge",
+
+    "Evidence Analysis",
+
+    "Comparative Discussion",
+
+    "Scientific Consensus",
+
+    "Research Limitations",
+
+    "Future Research Directions",
+
+    "Practical Implications",
+
+    "Conclusion"
+
+]
+
+
 def run_specialist(
 
     query,
@@ -13,6 +41,10 @@ def run_specialist(
 
 ):
 
+    # -----------------------------------------
+    # STEP 1 : Create Research Plan
+    # -----------------------------------------
+
     plan = create_research_plan(
 
         domain,
@@ -21,6 +53,10 @@ def run_specialist(
 
     )
 
+    # -----------------------------------------
+    # STEP 2 : Execute Research
+    # -----------------------------------------
+
     results = execute_research(
 
         query=query,
@@ -28,6 +64,10 @@ def run_specialist(
         sources=sources
 
     )
+
+    # -----------------------------------------
+    # STEP 3 : Organize Evidence
+    # -----------------------------------------
 
     evidence = synthesize_evidence(
 
@@ -41,17 +81,37 @@ def run_specialist(
 
     )
 
-    report = reflect_on_results(
+    # -----------------------------------------
+    # STEP 4 : Build Report Section-by-Section
+    # -----------------------------------------
 
-        domain,
+    report = "# ExperteezAI Research Report\n\n"
 
-        query,
+    for section in REPORT_SECTIONS:
 
-        plan,
+        print(f"Writing {section}...")
 
-        evidence
+        chapter = reflect_on_results(
 
-    )
+            domain=domain,
+
+            query=query,
+
+            plan=plan,
+
+            evidence=evidence,
+
+            section=section
+
+        )
+
+        report += chapter.strip()
+
+        report += "\n\n"
+
+    # -----------------------------------------
+    # STEP 5 : Return Everything
+    # -----------------------------------------
 
     return {
 
