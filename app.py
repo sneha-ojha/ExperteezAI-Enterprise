@@ -1,7 +1,10 @@
 import streamlit as st
+
 from validator import validate_domain
 from config import DOMAINS
 from agent import run_agent
+
+
 st.set_page_config(
     page_title="ExperteezAI Research",
     page_icon="🧠",
@@ -11,16 +14,18 @@ st.set_page_config(
 st.title("🧠 ExperteezAI Research")
 
 st.markdown(
-"""
-Generate comprehensive, evidence-based research papers using specialized
-domain research agents and trusted knowledge sources.
-"""
+    """
+    Generate comprehensive, evidence-based research papers using specialized
+    domain research agents and trusted knowledge sources.
+    """
 )
+
 
 domain = st.selectbox(
     "Research Domain",
     list(DOMAINS.keys())
 )
+
 
 query = st.text_area(
     "Research Topic",
@@ -28,73 +33,198 @@ query = st.text_area(
     placeholder="Example: Recent developments in Retrieval-Augmented Generation"
 )
 
-if st.button("🚀 Generate Research Paper", use_container_width=True):
+
+if st.button(
+    "🚀 Generate Research Paper",
+    use_container_width=True
+):
 
     if not query.strip():
+
         st.warning("Please enter a research topic.")
         st.stop()
 
+
+    # -----------------------------------------
+    # STEP 1 : Domain Validation
+    # -----------------------------------------
+
     with st.spinner("Identifying research domain..."):
+
         detected_domain = validate_domain(query)
+
 
     col1, col2 = st.columns(2)
 
+
     with col1:
-        st.info(f"Selected Domain\n\n**{domain}**")
+
+        st.info(
+            f"Selected Domain\n\n**{domain}**"
+        )
+
 
     with col2:
-        st.info(f"Detected Domain\n\n**{detected_domain}**")
+
+        st.info(
+            f"Detected Domain\n\n**{detected_domain}**"
+        )
+
 
     if detected_domain != domain:
 
-        st.error("The selected domain does not match the detected topic.")
+        st.error(
+            "The selected domain does not match the detected topic."
+        )
 
-        if st.button(f"Switch to {detected_domain}"):
+        if st.button(
+            f"Switch to {detected_domain}"
+        ):
 
             domain = detected_domain
 
         else:
+
             st.stop()
 
-    with st.spinner("ExperteezAI specialists are conducting research..."):
 
-        result = run_agent(domain, query)
+    # -----------------------------------------
+    # RESEARCH STATUS
+    # -----------------------------------------
 
     st.divider()
 
-    with st.expander("📋 Research Plan", expanded=False):
-        st.markdown(result["plan"])
+    st.subheader("🔬 Research Progress")
 
-    with st.expander("🧩 Evidence Synthesis", expanded=False):
-        st.markdown(result["evidence"])
+
+    plan_status = st.empty()
+    search_status = st.empty()
+    evidence_status = st.empty()
+
+
+    plan_status.info(
+        "📋 Creating research plan..."
+    )
+
+    search_status.info(
+        "🔎 Waiting to search sources..."
+    )
+
+    evidence_status.info(
+        "🧩 Waiting to organize evidence..."
+    )
+
+
+    # -----------------------------------------
+    # REPORT AREA
+    # -----------------------------------------
 
     st.divider()
 
     st.header("📖 ExperteezAI Research Paper")
 
-    reports = result["reflection"]
 
-    if isinstance(reports, list):
+    # Store placeholders for sections
+    section_placeholders = {}
 
-        progress = st.progress(0)
+    # Keep track of completed sections
+    completed_sections = set()
 
-        total = len(reports)
 
-        for i, section in enumerate(reports):
+    # -----------------------------------------
+    # RUN RESEARCH STREAM
+    # -----------------------------------------
 
-            progress.progress((i + 1) / total)
+    for event in run_agent(domain, query):
 
-            st.markdown(section)
 
-            if i != total - 1:
-                st.divider()
+        # -------------------------------------
+        # RESEARCH PLAN
+        # -------------------------------------
 
-        progress.empty()
+        if event["type"] == "plan":
 
-    else:
+            plan_status.success(
+                "📋 Research plan ✓"
+            )
 
-        st.markdown(reports)
+            with st.expander(
+                "📋 Research Plan",
+                expanded=False
+            ):
 
-    st.divider()
+                st.markdown(
+                    event["data"]
+                )
 
-    st.success("Research completed successfully.")
+
+        # -------------------------------------
+        # SEARCH COMPLETE
+        # -------------------------------------
+
+        elif event["type"] == "search_complete":
+
+            search_status.success(
+                "🔎 Sources searched ✓"
+            )
+
+
+        # -------------------------------------
+        # EVIDENCE
+        # -------------------------------------
+
+        elif event["type"] == "evidence":
+
+            evidence_status.success(
+                "🧩 Evidence organized ✓"
+            )
+
+            with st.expander(
+                "🧩 Evidence Synthesis",
+                expanded=False
+            ):
+
+                st.markdown(
+                    event["data"]
+                )
+
+
+        # -------------------------------------
+        # REPORT SECTION
+        # -------------------------------------
+
+        elif event["type"] == "section":
+
+            section = event["section"]
+            content = event["data"]
+
+            completed_sections.add(section)
+
+
+            # Create a placeholder if this is
+            # the first time we see this section
+
+            if section not in section_placeholders:
+
+                section_placeholders[section] = st.empty()
+
+
+            placeholder = section_placeholders[section]
+
+
+            placeholder.markdown(
+                content
+            )
+
+
+        # -------------------------------------
+        # COMPLETE
+        # -------------------------------------
+
+        elif event["type"] == "complete":
+
+            st.divider()
+
+            st.success(
+                "✅ Research completed successfully."
+            )
