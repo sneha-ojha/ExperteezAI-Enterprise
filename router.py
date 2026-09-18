@@ -4,6 +4,8 @@ from specialists.business import business_specialist
 from specialists.history import history_specialist
 from specialists.sports import sports_specialist
 from specialists.fashion import fashion_specialist
+from specialists.generic import generic_specialist
+
 
 def route(domain):
     routes = {
@@ -14,4 +16,7 @@ def route(domain):
         "Sports": sports_specialist,
         "Fashion": fashion_specialist
     }
-    return routes.get(domain)
+
+    # Use a specialized specialist when available.
+    # Otherwise use the generic specialist for custom domains.
+    return routes.get(domain, generic_specialist)

@@ -1,18 +1,17 @@
 from specialists.base_specialist import run_specialist
 
-from sources.sports_sources import SPORTS_SOURCES
 
-
-def sports_specialist(
+def generic_specialist(
     query,
+    domain,
     output_type,
     output_length,
     public_sources
 ):
     return run_specialist(
         query=query,
-        domain="Sports",
-        sources=SPORTS_SOURCES,
+        domain=domain,
+        sources=[],
         output_type=output_type,
         output_length=output_length,
         public_sources=public_sources

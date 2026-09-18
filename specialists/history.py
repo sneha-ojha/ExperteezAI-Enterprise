@@ -1,9 +1,19 @@
 from specialists.base_specialist import run_specialist
+
 from sources.history_sources import HISTORY_SOURCES
 
-def history_specialist(query):
+
+def history_specialist(
+    query,
+    output_type,
+    output_length,
+    public_sources
+):
     return run_specialist(
         query=query,
         domain="History",
-        sources=HISTORY_SOURCES
+        sources=HISTORY_SOURCES,
+        output_type=output_type,
+        output_length=output_length,
+        public_sources=public_sources
     )

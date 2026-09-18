@@ -1,190 +1,257 @@
-import time
-
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-from planner import create_research_plan
 from executor import execute_research
 from reflection import reflect_on_results
-from synthesizer import synthesize_evidence
 
 
-REPORT_SECTIONS = [
-    "Executive Brief",
-    "Research Objective",
-    "Research Methodology",
-    "Current State of Knowledge",
-    "Evidence Analysis",
-    "Comparative Discussion",
-    "Scientific Consensus",
-    "Research Limitations",
-    "Future Research Directions",
-    "Practical Implications",
-    "Conclusion"
-]
 
+def get_report_sections(output_type, output_length):
 
-def generate_section(section, domain, query, plan, evidence):
+    # Concise = fewer, larger sections
+    if output_length <= 2500:
 
-    try:
+        if output_type == "Leadership Brief":
+            return [
+                "Executive Summary",
+                "Key Findings",
+                "Business Implications",
+                "Next Steps"
+            ]
 
-        print(f"Writing {section}...")
+        if output_type == "Training & Onboarding":
+            return [
+                "Overview",
+                "Key Concepts",
+                "Practical Guidance",
+                "Quick Reference"
+            ]
 
-        start = time.perf_counter()
+        if output_type == "SOP / Process":
+            return [
+                "Purpose & Scope",
+                "Procedure",
+                "Important Checks",
+                "Final Checklist"
+            ]
 
-        chapter = reflect_on_results(
-            domain=domain,
-            query=query,
-            plan=plan,
-            evidence=evidence,
-            section=section
-        )
+        if output_type == "Decision Analysis":
+            return [
+                "Executive Summary",
+                "Options & Comparison",
+                "Risks & Trade-offs",
+                "Decision Considerations"
+            ]
 
-        elapsed = time.perf_counter() - start
+        if output_type == "Knowledge Guide":
+            return [
+                "Overview",
+                "Core Concepts",
+                "Practical Understanding",
+                "Key Takeaways"
+            ]
 
-        print(
-            f"   ⏱️ {section}: "
-            f"{elapsed:.2f} seconds"
-        )
+        return [
+            "Overview",
+            "Key Findings",
+            "Practical Guidance",
+            "Next Steps"
+        ]
 
-        return section, chapter
+    # Standard = balanced number of sections
+    elif output_length <= 5000:
 
-    except Exception as e:
+        if output_type == "Leadership Brief":
+            return [
+                "Executive Summary",
+                "Business Context",
+                "Key Findings",
+                "Business Implications",
+                "Risks & Considerations",
+                "Next Steps"
+            ]
 
-        print(
-            f"❌ Error writing {section}: "
-            f"{type(e).__name__}: {e}"
-        )
+        if output_type == "Training & Onboarding":
+            return [
+                "Overview",
+                "Key Concepts",
+                "How It Works",
+                "Practical Examples",
+                "Common Mistakes",
+                "Quick Reference"
+            ]
 
-        return section, (
-            f"## {section}\n\n"
-            f"Unable to generate this section."
-        )
+        if output_type == "SOP / Process":
+            return [
+                "Purpose & Scope",
+                "Prerequisites",
+                "Roles & Responsibilities",
+                "Procedure",
+                "Important Checks",
+                "Exceptions & Risks",
+                "Final Checklist"
+            ]
+
+        if output_type == "Decision Analysis":
+            return [
+                "Executive Summary",
+                "Decision Context",
+                "Available Options",
+                "Evidence & Comparison",
+                "Trade-offs & Risks",
+                "Decision Considerations"
+            ]
+
+        if output_type == "Knowledge Guide":
+            return [
+                "Overview",
+                "Core Concepts",
+                "Detailed Explanation",
+                "Examples",
+                "Practical Considerations",
+                "Key Takeaways"
+            ]
+
+        return [
+            "Executive Summary",
+            "Context",
+            "Key Findings",
+            "Detailed Analysis",
+            "Practical Considerations",
+            "Next Steps"
+        ]
+
+    # Detailed = more sections
+    else:
+
+        if output_type == "Leadership Brief":
+            return [
+                "Executive Summary",
+                "Business Context",
+                "Current Situation",
+                "Key Findings",
+                "Evidence Analysis",
+                "Options & Alternatives",
+                "Risks & Considerations",
+                "Implementation Considerations",
+                "Next Steps"
+            ]
+
+        if output_type == "Training & Onboarding":
+            return [
+                "Overview",
+                "Prerequisites",
+                "Core Concepts",
+                "How It Works",
+                "Detailed Explanation",
+                "Practical Examples",
+                "Common Mistakes",
+                "Practical Exercises",
+                "Quick Reference"
+            ]
+
+        if output_type == "SOP / Process":
+            return [
+                "Purpose & Scope",
+                "Prerequisites",
+                "Required Inputs",
+                "Roles & Responsibilities",
+                "Step-by-Step Procedure",
+                "Important Checks",
+                "Exceptions & Edge Cases",
+                "Risks & Controls",
+                "Final Checklist"
+            ]
+
+        if output_type == "Decision Analysis":
+            return [
+                "Executive Summary",
+                "Decision Context",
+                "Objectives & Criteria",
+                "Available Options",
+                "Evidence Analysis",
+                "Detailed Comparison",
+                "Trade-offs",
+                "Risks & Constraints",
+                "Decision Considerations"
+            ]
+
+        if output_type == "Knowledge Guide":
+            return [
+                "Overview",
+                "Background",
+                "Core Concepts",
+                "Detailed Explanation",
+                "How Different Concepts Connect",
+                "Practical Examples",
+                "Practical Considerations",
+                "Limitations",
+                "Key Takeaways"
+            ]
+
+        return [
+            "Executive Summary",
+            "Context",
+            "Core Concepts",
+            "Detailed Analysis",
+            "Evidence",
+            "Practical Applications",
+            "Risks & Limitations",
+            "Implementation Considerations",
+            "Next Steps"
+        ]
 
 
 def run_specialist(
     query,
     domain,
-    sources
+    sources,
+    output_type,
+    output_length,
+    public_sources
 ):
 
-    total_start = time.perf_counter()
+    # ---------------------------------------------------------
+    # 1. SEARCH
+    # ---------------------------------------------------------
+    #
+    # We intentionally skip the planner and evidence-synthesis
+    # LLM calls here. They were adding latency before the user
+    # saw anything.
+    #
+    search_results = execute_research(query, sources)
 
-    # -----------------------------------------
-    # STEP 1 : Create Research Plan
-    # -----------------------------------------
+    # ---------------------------------------------------------
+    # 2. CREATE THE REPORT STRUCTURE
+    # ---------------------------------------------------------
 
-    start = time.perf_counter()
-
-    plan = create_research_plan(
-        domain,
-        query
+    sections = get_report_sections(
+        output_type,
+        output_length
     )
 
-    print(
-        f"⏱️ Research Planner: "
-        f"{time.perf_counter() - start:.2f} seconds"
-    )
+    # ---------------------------------------------------------
+    # 3. GENERATE SECTIONS ONE BY ONE
+    # ---------------------------------------------------------
 
-    # Send plan to Streamlit immediately
-    yield {
-        "type": "plan",
-        "data": plan
-    }
+    for section in sections:
 
-    # -----------------------------------------
-    # STEP 2 : Execute Research
-    # -----------------------------------------
+        content = reflect_on_results(
+            domain=domain,
+            query=query,
+            plan="",
+            evidence=search_results,
+            section=section,
+            output_type=output_type,
+            output_length=output_length
+        )
 
-    start = time.perf_counter()
-
-    results = execute_research(
-        query=query,
-        sources=sources
-    )
-
-    print(
-        f"⏱️ Parallel Search: "
-        f"{time.perf_counter() - start:.2f} seconds"
-    )
-
-    # Send search completion immediately
-    yield {
-        "type": "search_complete"
-    }
-
-    # -----------------------------------------
-    # STEP 3 : Organize Evidence
-    # -----------------------------------------
-
-    start = time.perf_counter()
-
-    evidence = synthesize_evidence(
-        domain,
-        query,
-        plan,
-        results
-    )
-
-    print(
-        f"⏱️ Evidence Synthesis: "
-        f"{time.perf_counter() - start:.2f} seconds"
-    )
-
-    # Send evidence completion immediately
-    yield {
-        "type": "evidence",
-        "data": evidence
-    }
-
-    # -----------------------------------------
-    # STEP 4 : Generate Report Sections
-    #          IN PARALLEL
-    # -----------------------------------------
-
-    reflection_start = time.perf_counter()
-
-    MAX_CONCURRENT_SECTIONS = 2
-
-    with ThreadPoolExecutor(
-        max_workers=MAX_CONCURRENT_SECTIONS
-    ) as executor:
-
-        futures = {
-            executor.submit(
-                generate_section,
-                section,
-                domain,
-                query,
-                plan,
-                evidence
-            ): section
-            for section in REPORT_SECTIONS
+        yield {
+            "type": "section",
+            "section": section,
+            "data": content
         }
 
-        for future in as_completed(futures):
-
-            section, chapter = future.result()
-
-            # Send each section immediately
-            yield {
-                "type": "section",
-                "section": section,
-                "data": chapter
-            }
-
-    print(
-        f"⏱️ Parallel Reflection: "
-        f"{time.perf_counter() - reflection_start:.2f} seconds"
-    )
-
-    # -----------------------------------------
-    # STEP 5 : Research Complete
-    # -----------------------------------------
-
-    print(
-        f"\n🚀 TOTAL RESEARCH TIME: "
-        f"{time.perf_counter() - total_start:.2f} seconds\n"
-    )
+    # ---------------------------------------------------------
+    # 4. COMPLETE
+    # ---------------------------------------------------------
 
     yield {
         "type": "complete"

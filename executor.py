@@ -1,18 +1,43 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
+def run_tool(tool, query):
+
+    try:
+        print(f"Searching {tool.__name__}...")
+
+        result = tool(query)
+
+        return tool.__name__, result
+
+    except Exception as e:
+
+        print(tool.__name__, e)
+
+        return tool.__name__, []
+
+
 def execute_research(query, sources):
 
     results = {}
 
-    for tool in sources:
+    if not sources:
+        return results
 
-        try:
-            print(f"Searching {tool.__name__}...")
+    # Run source searches concurrently.
+    max_workers = min(len(sources), 5)
 
-            results[tool.__name__] = tool(query)
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
 
-        except Exception as e:
+        futures = [
+            executor.submit(run_tool, tool, query)
+            for tool in sources
+        ]
 
-            print(tool.__name__, e)
+        for future in as_completed(futures):
 
-            results[tool.__name__] = []
+            tool_name, result = future.result()
+
+            results[tool_name] = result
 
     return results

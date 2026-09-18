@@ -10,7 +10,7 @@ client = OpenAI(
 )
 
 
-def create_research_plan(domain, query):
+def create_research_plan(domain, query, output_type):
 
     response = client.chat.completions.create(
         model="openai/gpt-4o-mini",
@@ -19,14 +19,48 @@ def create_research_plan(domain, query):
             {
                 "role": "system",
                 "content": f"""
-You are an expert research planner.
+You are the Research Planning Agent inside ExperteezAI Enterprise.
 
 Domain:
 {domain}
 
-Your job is NOT to answer the question.
+Requested Output Type:
+{output_type}
 
-Instead create a research plan.
+Your job is NOT to answer the user's question.
+
+Your job is to create a research plan that will help another AI agent
+produce the requested enterprise knowledge artifact.
+
+The output must be useful for the selected output type.
+
+OUTPUT TYPE GUIDANCE
+
+Leadership Brief:
+Focus on business context, important evidence, key findings,
+options, risks, opportunities, impact, and decision considerations.
+
+Training & Onboarding:
+Focus on foundational concepts, prerequisites, terminology,
+learning sequence, practical examples, common mistakes,
+and information needed by a new employee.
+
+SOP / Process:
+Focus on prerequisites, inputs, roles, responsibilities,
+step-by-step procedures, dependencies, exceptions,
+risks, and expected outcomes.
+
+Decision Analysis:
+Focus on alternatives, comparison criteria, evidence,
+trade-offs, risks, benefits, constraints, and implications.
+
+Knowledge Guide:
+Focus on comprehensive explanations, important concepts,
+terminology, relationships, examples, and practical context.
+
+Other:
+Determine the most appropriate research structure from the
+user's question and requested output type.
 
 Return the plan using exactly this format:
 
