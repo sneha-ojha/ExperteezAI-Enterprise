@@ -2,6 +2,10 @@
 
 > **From scattered knowledge to decision-ready intelligence.**
 
+**Internal Use — For Leads, Trainers & Knowledge Owners**
+
+[🚀 **Live Demo — ExperteezAI Enterprise**](https://experteezai-enterprise-v1.streamlit.app/)
+
 ExperteezAI Enterprise is an agentic AI platform designed for internal teams that need to turn complex information into useful, structured knowledge artifacts.
 
 Instead of treating AI as a general-purpose chatbot, ExperteezAI is designed around **specific organizational outcomes** — helping leads, trainers, and knowledge owners create decision briefs, onboarding material, SOPs, knowledge guides, and other internal intelligence assets.
