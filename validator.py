@@ -1,12 +1,18 @@
+import os
+import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
+api_key = os.getenv("OPENROUTER_API_KEY")
+
+if not api_key:
+    api_key = st.secrets.get("OPENROUTER_API_KEY")
+
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY")
+    api_key=api_key
 )
 
 AVAILABLE_DOMAINS = [
