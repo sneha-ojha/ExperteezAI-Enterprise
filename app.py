@@ -934,7 +934,7 @@ if step < 4:
 
 
 # ============================================================
-# STEP 1 — WELCOME
+# STEP 1 - WELCOME
 # ============================================================
 
 if step == 0:
@@ -1053,7 +1053,7 @@ if step == 0:
 
 
 # ============================================================
-# STEP 2 — LEADERSHIP BRIEF
+# STEP 2 - LEADERSHIP BRIEF
 # ============================================================
 
 elif step == 1:
@@ -1137,7 +1137,7 @@ elif step == 1:
 
 
 # ============================================================
-# STEP 3 — TRAINING
+# STEP 3 - TRAINING
 # ============================================================
 
 elif step == 2:
@@ -1221,7 +1221,7 @@ elif step == 2:
 
 
 # ============================================================
-# STEP 4 — SOP
+# STEP 4 - SOP
 # ============================================================
 
 elif step == 3:
@@ -1343,7 +1343,7 @@ if st.session_state.walkthrough_step == 4:
 
 
     # ========================================================
-    # SECTION 1 — OUTPUT TYPE & DOMAIN
+    # SECTION 1 - OUTPUT TYPE & DOMAIN
     # ========================================================
 
     with st.container(border=True):
@@ -1432,7 +1432,7 @@ if st.session_state.walkthrough_step == 4:
 
 
     # ========================================================
-    # SECTION 2 — TOPIC / QUESTION
+    # SECTION 2 - TOPIC / QUESTION
     # ========================================================
 
     with st.container(border=True):
@@ -1462,7 +1462,7 @@ if st.session_state.walkthrough_step == 4:
 
 
     # ========================================================
-    # SECTION 3 — DETAIL & SOURCES
+    # SECTION 3 - DETAIL & SOURCES
     # ========================================================
 
     with st.container(border=True):
@@ -1549,7 +1549,7 @@ if st.session_state.walkthrough_step == 4:
                 height=110,
                 placeholder=(
                     "Paste public GitHub, Google Drive, "
-                    "or documentation URLs — one per line."
+                    "or documentation URLs - one per line."
                 ),
                 label_visibility="collapsed"
             )
